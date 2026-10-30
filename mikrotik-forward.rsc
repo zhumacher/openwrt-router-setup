@@ -37,12 +37,14 @@
         :if ([:len $natId] = 0) do={
             /ip firewall nat add chain=dstnat in-interface-list=WAN protocol=tcp dst-port=$targetPort action=dst-nat to-addresses=$targetIp to-ports=$targetPort comment=$ruleTag;
             :set addedNat true;
-            :if ([:len [/ip firewall nat find]] > 1) do={ /ip firewall nat move [/ip firewall nat find where comment=$ruleTag] [:pick [/ip firewall nat find] 0]; };
+            :local staticNat [/ip firewall nat find where dynamic=no];
+            :if ([:len $staticNat] > 1) do={ /ip firewall nat move [/ip firewall nat find where comment=$ruleTag] [:pick $staticNat 0]; };
         };
         :if ([:len $filterId] = 0) do={
             /ip firewall filter add chain=forward in-interface-list=WAN connection-nat-state=dstnat connection-state=new,established,related protocol=tcp dst-address=($targetIp . "/32") dst-port=$targetPort action=accept comment=$ruleTag;
             :set addedFilter true;
-            :if ([:len [/ip firewall filter find]] > 1) do={ /ip firewall filter move [/ip firewall filter find where comment=$ruleTag] [:pick [/ip firewall filter find] 0]; };
+            :local staticFilter [/ip firewall filter find where dynamic=no];
+            :if ([:len $staticFilter] > 1) do={ /ip firewall filter move [/ip firewall filter find where comment=$ruleTag] [:pick $staticFilter 0]; };
         };
         :if ([/ip dhcp-server lease get $leaseId dynamic] = true) do={ /ip dhcp-server lease make-static $leaseId; };
     } on-error={
