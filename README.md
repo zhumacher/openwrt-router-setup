@@ -38,12 +38,18 @@ SSH-отпечатками. Токен DuckDNS не пересылать.
 ```
 
 Этот блок предназначен для RouterOS MikroTik. В консоли OpenWrt он не работает.
+На старых RouterOS без доверенных CA HTTPS-загрузка может завершиться
+`no trusted CA certificate found`. Тогда открыть [исходник скрипта](mikrotik-forward.rsc)
+на компьютере и вставить его содержимое в терминал MikroTik после задания
+двух глобальных параметров.
 Скрипт проверяет DHCP lease и существующую WAN interface list, сохраняет
 экспорты firewall и DHCP leases в Files, закрепляет адрес целевого устройства
 и добавляет проброс/разрешение только заданного TCP-порта на этот адрес.
 При конфликте порта останавливается. Результат: `FORWARD_OK`.
 На основном MikroTik нужен публичный IPv4; результат извне проверяется отдельно.
 Скрипт подготовлен по документации RouterOS; на устройстве пока не исполнялся.
+При перестановке правил пропускаются динамические и встроенные записи
+(например, dummy-правило FastTrack).
 
 Источники: [MikroTik: port forwarding](https://help.mikrotik.com/docs/spaces/RKB/pages/154042388/Port+forwarding),
 [DHCP static leases](https://manual.mikrotik.com/docs/network-management/dhcp/).
